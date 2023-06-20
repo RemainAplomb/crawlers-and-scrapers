@@ -79,14 +79,18 @@ def extract_header_value(headers, header_name):
 #           - If not direct search, it will have to manually loop through the latest n number of emails to look for matches
 #           - If direct search, it will use the search function from imapclient
 #   
-def ReadInFurnishedFinderHousingRequestsEmails(subject_keywords=None, sender=None, num_emails=20, direct_search=False):
+def ReadInFurnishedFinderHousingRequestsEmails(subject_keywords=None, sender=None, num_emails=20, direct_search=False, unread_only=False):
     # TODO: write the code for this function to return the emails that qualify
     if not subject_keywords:
         return []
     
     if not direct_search:
         # Retrieve the newest num_emails emails
-        messages = server.search('ALL')[-num_emails:]
+        if unread_only:
+            condition_prefix = "UNSEEN"
+        else:
+            condition_prefix = "ALL"
+        messages = server.search(condition_prefix)[-num_emails:]
 
         # Fetch the content of the retrieved emails
         emails = []
@@ -118,10 +122,13 @@ def ReadInFurnishedFinderHousingRequestsEmails(subject_keywords=None, sender=Non
                         emails.append(email)
     else:
         # Determine the condition for searching
+        condition_prefix = ""
+        if unread_only:
+            condition_prefix = "UNSEEN "
         if not sender:
-            search_condition = f'SUBJECT "{subject_keywords}"'
+            search_condition = f'{condition_prefix}SUBJECT "{subject_keywords}"'
         else:
-            search_condition = f'SUBJECT "{subject_keywords}" FROM "{sender}"'
+            search_condition = f'{condition_prefix}SUBJECT "{subject_keywords}" FROM "{sender}"'
 
         # Search for emails with the specified subject and sender
         messages = server.search(search_condition)
@@ -182,96 +189,159 @@ def PullInformationFromEmailsAndPutIntoDataframe(emails):
 if __name__ == "__main__":
     server_login()
     print("\n===============================================================\n")
-    # Test 1
+    # # Test 1
+    # # No sender info
+    # # with subject keywords
+    # # Not direct search
+    # # look into latest 100 emails
+    # emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", num_emails=20)
+    # # print(len(emails))
+    
+    # dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
+    # print('Test 1: (subject_keywords="Traveler Housing Request", num_emails=20)')
+    # print(dataframe)
+
+    # print("\n===============================================================\n")
+
+    # # Test 2.1
+    # # No sender info
+    # # with subject keywords
+    # # Not direct search
+    # # look into latest 100 emails
+    # # Unread only
+    # emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", num_emails=100, unread_only = True)
+    # # print(len(emails))
+    
+    # dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
+    # print('Test 2.1: (subject_keywords="Traveler Housing Request", num_emails=100, unread_only = True)')
+    # print(dataframe)
+
+    # print("\n===============================================================\n")
+
+    # # Test 2.2
+    # # No sender info
+    # # with subject keywords
+    # # Not direct search
+    # # look into latest 100 emails
+    # # Unread only
+    # emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", num_emails=100, unread_only = True)
+    # # print(len(emails))
+    
+    # dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
+    # print('Test 2.2: (subject_keywords="Traveler Housing Request", num_emails=100, unread_only = True)')
+    # print(dataframe)
+
+    # print("\n===============================================================\n")
+
+    # # Test 2.3
+    # # No sender info
+    # # with subject keywords
+    # # Not direct search
+    # # look into latest 100 emails
+    # # Not unread only
+    # emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", num_emails=100, unread_only = False)
+    # # print(len(emails))
+    
+    # dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
+    # print('Test 2.3: (subject_keywords="Traveler Housing Request", num_emails=100)')
+    # print(dataframe)
+
+    # print("\n===============================================================\n")
+
+    # # Test 3
+    # # With sender info
+    # # with subject keywords
+    # # Not direct search
+    # # look into latest 100 emails
+    # emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", sender="software@venturebnb.io", num_emails=100)
+    # # print(len(emails))
+    
+    # dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
+    # print('Test 3: (subject_keywords="Traveler Housing Request", sender="software@venturebnb.io", num_emails=100)')
+    # print(dataframe)
+
+    # print("\n===============================================================\n")
+
+    # # Test 4
+    # # With sender info
+    # # with subject keywords
+    # # Use direct search (will only take matching emails by directly using the given condition to search)
+    # # look into latest 100 emails
+    # emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", sender="software@venturebnb.io", direct_search=True, num_emails=100)
+    # # print(len(emails))
+    
+    # dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
+    # print('Test 4: (subject_keywords="Traveler Housing Request", sender="software@venturebnb.io", direct_search=True, num_emails=100)')
+    # print(dataframe)
+
+    # print("\n===============================================================\n")
+
+    # # Test 5
+    # # With sender info
+    # # with subject keywords
+    # # Use direct search (will only take matching emails by directly using the given condition to search)
+    # # look into latest 100 emails
+    # emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", sender="john@venturebnb.io", direct_search=True, num_emails=100)
+    # # print(len(emails))
+    
+    # dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
+    # print('Test 5: (subject_keywords="Traveler Housing Request", sender="john@venturebnb.io", direct_search=True, num_emails=100)')
+    # print(dataframe)
+
+    # print("\n===============================================================\n")
+
+    # Test 6.1 
     # No sender info
-    # with subject keywords
-    # Not direct search
-    # look into latest 100 emails
-    emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", num_emails=20)
-    # print(len(emails))
-    
-    dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
-    print('Test 1: (subject_keywords="Traveler Housing Request", num_emails=20)')
-    print(dataframe)
-
-    print("\n===============================================================\n")
-
-    # Test 2
-    # No sender info
-    # with subject keywords
-    # Not direct search
-    # look into latest 100 emails
-    emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", num_emails=100)
-    # print(len(emails))
-    
-    dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
-    print('Test 2: (subject_keywords="Traveler Housing Request", num_emails=100)')
-    print(dataframe)
-
-    print("\n===============================================================\n")
-
-    # Test 3
-    # With sender info
-    # with subject keywords
-    # Not direct search
-    # look into latest 100 emails
-    emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", sender="software@venturebnb.io", num_emails=100)
-    # print(len(emails))
-    
-    dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
-    print('Test 3: (subject_keywords="Traveler Housing Request", sender="software@venturebnb.io", num_emails=100)')
-    print(dataframe)
-
-    print("\n===============================================================\n")
-
-    # Test 4
-    # With sender info
     # with subject keywords
     # Use direct search (will only take matching emails by directly using the given condition to search)
     # look into latest 100 emails
-    emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", sender="software@venturebnb.io", direct_search=True, num_emails=100)
+    # Unread only
+    emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100, unread_only=True)
     # print(len(emails))
     
     dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
-    print('Test 4: (subject_keywords="Traveler Housing Request", sender="software@venturebnb.io", direct_search=True, num_emails=100)')
+    print('Test 6.1: (subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100, unread_only=True)')
     print(dataframe)
 
     print("\n===============================================================\n")
 
-    # Test 5
-    # With sender info
-    # with subject keywords
-    # Use direct search (will only take matching emails by directly using the given condition to search)
-    # look into latest 100 emails
-    emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", sender="john@venturebnb.io", direct_search=True, num_emails=100)
-    # print(len(emails))
-    
-    dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
-    print('Test 5: (subject_keywords="Traveler Housing Request", sender="john@venturebnb.io", direct_search=True, num_emails=100)')
-    print(dataframe)
-
-    print("\n===============================================================\n")
-
-    # Test 6
+    # Test 6.2
     # No sender info
     # with subject keywords
     # Use direct search (will only take matching emails by directly using the given condition to search)
     # look into latest 100 emails
-    emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100)
+    # Unread only
+    emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100, unread_only=True)
     # print(len(emails))
     
     dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
-    print('Test 6: (subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100)')
+    print('Test 6.2: (subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100, unread_only=True)')
     print(dataframe)
 
     print("\n===============================================================\n")
+
+    # Test 6.3
+    # No sender info
+    # with subject keywords
+    # Use direct search (will only take matching emails by directly using the given condition to search)
+    # look into latest 100 emails
+    # Not unread only
+    emails = ReadInFurnishedFinderHousingRequestsEmails(subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100, unread_only=False)
+    # print(len(emails))
+    
+    dataframe = PullInformationFromEmailsAndPutIntoDataframe(emails)
+    print('Test 6.3: (subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100, unread_only=False)')
+    print(dataframe)
+
+    print("\n===============================================================\n")
+    
 
     server_logout()
 
 """
 Testing caseStudy.py: 
 
-(base) PS E:\assessment\venturebnb> python caseStudy.py
+(base) PS E:\study\crawlers\1 - Crawl Email> python caseStudy.py
 
 ===============================================================
 
@@ -282,7 +352,21 @@ Index: []
 
 ===============================================================
 
-Test 2: (subject_keywords="Traveler Housing Request", num_emails=100)
+Test 2.1: (subject_keywords="Traveler Housing Request", num_emails=100, unread_only = True)
+         Tenant     Email Address Phone Number Number of Travelers                     Dates
+0    Mark Frank    mark@yahoo.com   8284763558                   2  03/26/2023 -- 05/13/2023
+1  Lauren James  lauren@yahoo.com   8284763558                   2  03/26/2023 -- 05/13/2023
+
+===============================================================
+
+Test 2.2: (subject_keywords="Traveler Housing Request", num_emails=100, unread_only = True)
+Empty DataFrame
+Columns: [Tenant, Email Address, Phone Number, Number of Travelers, Dates]
+Index: []
+
+===============================================================
+
+Test 2.3: (subject_keywords="Traveler Housing Request", num_emails=100)
          Tenant     Email Address Phone Number Number of Travelers                     Dates
 0    Mark Frank    mark@yahoo.com   8284763558                   2  03/26/2023 -- 05/13/2023
 1  Lauren James  lauren@yahoo.com   8284763558                   2  03/26/2023 -- 05/13/2023
@@ -310,7 +394,21 @@ Index: []
 
 ===============================================================
 
-Test 6: (subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100)
+Test 6.1: (subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100, unread_only=True)
+         Tenant     Email Address Phone Number Number of Travelers                     Dates
+0    Mark Frank    mark@yahoo.com   8284763558                   2  03/26/2023 -- 05/13/2023
+1  Lauren James  lauren@yahoo.com   8284763558                   2  03/26/2023 -- 05/13/2023
+
+===============================================================
+
+Test 6.2: (subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100, unread_only=True)
+Empty DataFrame
+Columns: [Tenant, Email Address, Phone Number, Number of Travelers, Dates]
+Index: []
+
+===============================================================
+
+Test 6.3: (subject_keywords="Traveler Housing Request", direct_search=True, num_emails=100, unread_only=False)
          Tenant     Email Address Phone Number Number of Travelers                     Dates
 0    Mark Frank    mark@yahoo.com   8284763558                   2  03/26/2023 -- 05/13/2023
 1  Lauren James  lauren@yahoo.com   8284763558                   2  03/26/2023 -- 05/13/2023
